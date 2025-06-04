@@ -1,0 +1,521 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>30 Days of Python - Live Editor</title>
+<style>
+  :root {
+    --primary-color: #4a90e2;
+    --secondary-color: #f5f7fa;
+    --accent-color: #ff6f61;
+    --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  body {
+    font-family: var(--font-family);
+    margin: 0;
+    padding: 0;
+    background: var(--secondary-color);
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  header {
+    background: var(--primary-color);
+    color: white;
+    padding: 1rem 2rem;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  }
+  header h1 {
+    margin: 0;
+    font-weight: 700;
+  }
+  #container {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+    height: calc(100vh - 88px);
+  }
+  nav {
+    width: 240px;
+    background: white;
+    border-right: 1px solid #ddd;
+    overflow-y: auto;
+    padding: 1rem;
+  }
+  nav h2 {
+    font-size: 1.25rem;
+    margin-top: 0;
+    margin-bottom: 1rem;
+    color: var(--primary-color);
+  }
+  nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  nav ul li {
+    margin-bottom: 0.5rem;
+  }
+  nav ul li button {
+    width: 100%;
+    background: none;
+    border: none;
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+    color: #555;
+    font-size: 1rem;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background 0.3s ease;
+  }
+  nav ul li button:hover,
+  nav ul li button.active {
+    background: var(--primary-color);
+    color: white;
+  }
+  main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: white;
+    padding: 1.5rem 2rem;
+    overflow-y: hidden;
+  }
+  main h2 {
+    margin-top: 0;
+    color: var(--primary-color);
+  }
+  #lesson-text {
+    flex-shrink: 0;
+    max-height: 160px;
+    overflow-y: auto;
+    margin-bottom: 1rem;
+    line-height: 1.4;
+  }
+  #editor-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  textarea#code-editor {
+    flex: 1;
+    font-family: monospace;
+    font-size: 1rem;
+    background: #1e1e1e;
+    color: #d4d4d4;
+    border: none;
+    border-radius: 6px;
+    padding: 1rem;
+    resize: none;
+    outline: none;
+    min-height: 250px;
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+  #run-btn {
+    margin-top: 0.75rem;
+    align-self: flex-start;
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 0.6rem 1.4rem;
+    font-size: 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  #run-btn:hover:enabled {
+    background: #e6554d;
+  }
+  #output-container {
+    margin-top: 1rem;
+    background: #272822;
+    color: #f8f8f2;
+    border-radius: 6px;
+    min-height: 100px;
+    max-height: 40vh;
+    overflow-y: auto;
+    padding: 1rem;
+    white-space: pre-wrap;
+    font-family: monospace;
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+  #status {
+    margin-top: 0.5rem;
+    font-style: italic;
+    color: var(--primary-color);
+  }
+  .navigation-buttons {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: space-between;
+  }
+  .navigation-buttons button {
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 0.5rem 1.2rem;
+    font-size: 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  .navigation-buttons button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+  }
+  .navigation-buttons button:hover:not(:disabled) {
+    background: #e6554d;
+  }
+  @media (max-width: 768px) {
+    #container {
+      flex-direction: column;
+      height: auto;
+    }
+    nav {
+      width: 100%;
+      max-height: 120px;
+      border-right: none;
+      border-bottom: 1px solid #ddd;
+      overflow-x: auto;
+      overflow-y: hidden;
+      white-space: nowrap;
+    }
+    nav ul {
+      display: flex;
+    }
+    nav ul li {
+      margin: 0 0.25rem;
+    }
+    nav ul li button {
+      padding: 0.5rem 1rem;
+      font-size: 0.85rem;
+    }
+    main {
+      padding: 1rem;
+      max-height: none;
+    }
+    #lesson-text {
+      max-height: 140px;
+    }
+    #code-editor {
+      max-height: 40vh;
+    }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>BIN MUDASSIR BMD </h1>
+  <p>30 Days of Python - Live Editor</p>
+</header>
+<div id="container">
+  <nav>
+    <h2>Days</h2>
+    <ul id="day-list"></ul>
+  </nav>
+  <main>
+    <h2 id="lesson-title">Welcome to 30 Days of Python</h2>
+    <div id="lesson-text">
+      Select a day from the left to start coding Python live in your browser.
+    </div>
+    <div id="editor-container" style="display:none;">
+      <textarea id="code-editor" spellcheck="false" aria-label="Python Code Editor"></textarea>
+      <button id="run-btn">Run Code</button>
+      <div id="status"></div>
+      <pre id="output-container"></pre>
+    </div>
+    <div class="navigation-buttons">
+      <button id="prev-btn" disabled>Previous</button>
+      <button id="next-btn" disabled>Next</button>
+    </div>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/pyodide/v0.23.2/full/pyodide.js"></script>
+<script>
+  async function main() {
+    let pyodide = null;
+    let isLoading = true;
+    const loadStatus = document.getElementById("status");
+    loadStatus.textContent = "Loading Python runtime...";
+    pyodide = await loadPyodide();
+    loadStatus.textContent = "Python runtime loaded.";
+
+    const lessons = [
+      {
+        title: "Day 1: Introduction to Python",
+        content: `Python is a popular programming language known for its readability and simplicity. Learn how to write your first Python code.`,
+        code: `print("Hello, World!")`
+      },
+      {
+        title: "Day 2: Variables and Data Types",
+        content: `Learn how to use variables to store data values and about basic data types in Python.`,
+        code: `name = "Alice"\nage = 30\nprint(name, "is", age, "years old.")`
+      },
+      {
+        title: "Day 3: Basic Operators",
+        content: `Understand basic arithmetic operators: +, -, *, / and how to use them.`,
+        code: `x = 10\ny = 3\nprint("Addition:", x + y)\nprint("Division:", x / y)`
+      },
+      {
+        title: "Day 4: Conditional Statements",
+        content: `Learn about if, elif, and else to control the flow of your program.`,
+        code: `age = 18\nif age >= 18:\n    print("You are an adult.")\nelse:\n    print("You are a minor.")`
+      },
+      {
+        title: "Day 5: Loops - for loop",
+        content: `Use for loops to repeat actions multiple times.`,
+        code: `for i in range(5):\n    print("Iteration", i)`
+      },
+      {
+        title: "Day 6: Loops - while loop",
+        content: `Use while loops for repeated execution based on a condition.`,
+        code: `count = 0\nwhile count < 5:\n    print("Count:", count)\n    count += 1`
+      },
+      {
+        title: "Day 7: Functions",
+        content: `Learn how to define and call functions for reusable code.`,
+        code: `def greet(name):\n    print("Hello,", name)\n\ngreet("Bob")`
+      },
+      {
+        title: "Day 8: Lists",
+        content: `Understand how to use lists to store multiple items.`,
+        code: `fruits = ["apple", "banana", "cherry"]\nfor fruit in fruits:\n    print(fruit)`
+      },
+      {
+        title: "Day 9: Tuples",
+        content: `Learn about tuples - immutable sequences.`,
+        code: `coords = (10, 20)\nprint("X:", coords[0])\nprint("Y:", coords[1])`
+      },
+      {
+        title: "Day 10: Dictionaries",
+        content: `Store data as key-value pairs with dictionaries.`,
+        code: `person = {"name": "John", "age": 25}\nprint(person["name"], "is", person["age"], "years old.")`
+      },
+      {
+        title: "Day 11: Sets",
+        content: `Learn about sets - collections of unique items.`,
+        code: `unique_numbers = {1, 2, 3, 3, 2}\nprint(unique_numbers)`
+      },
+      {
+        title: "Day 12: List Comprehensions",
+        content: `Create lists using list comprehensions for concise syntax.`,
+        code: `squares = [x**2 for x in range(6)]\nprint(squares)`
+      },
+      {
+        title: "Day 13: String Methods",
+        content: `Use methods to work with strings.`,
+        code: `"hello".capitalize()\n"hello world".replace("world", "Python")`
+      },
+      {
+        title: "Day 14: Reading Input",
+        content: `Learn how to get user input.`,
+        code: `name = input("Enter your name: ")\nprint("Hello, " + name)`
+      },
+      {
+        title: "Day 15: File Handling Basics",
+        content: `Learn how to read and write files in Python.`,
+        code: `with open("sample.txt", "w") as file:\n    file.write("Hello, file!")`
+      },
+      {
+        title: "Day 16: Exception Handling",
+        content: `Handle errors gracefully with try-except blocks.`,
+        code: `try:\n    print(10 / 0)\nexcept ZeroDivisionError:\n    print("Cannot divide by zero!")`
+      },
+      {
+        title: "Day 17: Modules and Imports",
+        content: `Use modules to organize your code and import functionality.`,
+        code: `import math\nprint(math.sqrt(16))`
+      },
+      {
+        title: "Day 18: Classes and Objects",
+        content: `Introduction to object-oriented programming with classes.`,
+        code: `class Dog:\n    def __init__(self, name):\n        self.name = name\n    def bark(self):\n        print(self.name + " says Woof!")\n\ndog = Dog("Fido")\ndog.bark()`
+      },
+      {
+        title: "Day 19: Inheritance",
+        content: `Learn how classes inherit from other classes.`,
+        code: `class Animal:\n    def sound(self):\n        print("Some sound")\n\nclass Cat(Animal):\n    def sound(self):\n        print("Meow")\n\ncat = Cat()\ncat.sound()`
+      },
+      {
+        title: "Day 20: Lambda Functions",
+        content: `Create small anonymous functions with lambda.`,
+        code: `square = lambda x: x ** 2\nprint(square(5))`
+      },
+      {
+        title: "Day 21: Map and Filter Functions",
+        content: `Use map and filter for functional programming.`,
+        code: `nums = [1, 2, 3, 4]\nsquared = list(map(lambda x: x**2, nums))\neven = list(filter(lambda x: x % 2 == 0, nums))\nprint(squared)\nprint(even)`
+      },
+      {
+        title: "Day 22: Generators",
+        content: `Create iterators using generators with yield.`,
+        code: `def count_up_to(n):\n    count = 1\n    while count <= n:\n        yield count\n        count += 1\n\nfor num in count_up_to(5):\n    print(num)`
+      },
+      {
+        title: "Day 23: Decorators",
+        content: `Modify functions using decorators.`,
+        code: `def decorator(func):\n    def wrapper():\n        print("Before function")\n        func()\n        print("After function")\n    return wrapper\n\n@decorator\ndef say_hello():\n    print("Hello")\n\nsay_hello()`
+      },
+      {
+        title: "Day 24: Working with Dates",
+        content: `Use datetime module to work with dates and times.`,
+        code: `import datetime\nnow = datetime.datetime.now()\nprint(now.strftime("%Y-%m-%d %H:%M:%S"))`
+      },
+      {
+        title: "Day 25: Regular Expressions",
+        content: `Use regex for pattern matching.`,
+        code: `import re\npattern = r"\\d+"\ntext = "There are 15 cats"\nmatches = re.findall(pattern, text)\nprint(matches)`
+      },
+      {
+        title: "Day 26: JSON Handling",
+        content: `Parse and write JSON data.`,
+        code: `import json\ndata = '{"name": "Alice", "age": 25}'\nobj = json.loads(data)\nprint(obj['name'])`
+      },
+      {
+        title: "Day 27: Virtual Environments",
+        content: `Introduction to using Python virtual environments.\n\nThis lesson is conceptual. You cannot create virtual environments inside this online editor. Please use your local machine terminal for this lesson.`,
+        code: `# Conceptual lesson - no runnable code here`
+      },
+      {
+        title: "Day 28: Installing Packages",
+        content: `Learn how to install Python packages using pip.\n\nNote: pip commands cannot be run here. Please use your terminal on your computer.`,
+        code: `# Conceptual lesson about pip`
+      },
+      {
+        title: "Day 29: Debugging Techniques",
+        content: `Tips and tools to debug Python code effectively.\n\nUse print statements or debugging modules like pdb.`,
+        code: `import pdb\n\ndef buggy_function(x):\n    pdb.set_trace()\n    return 10 / x\n\nprint(buggy_function(2))`
+      },
+      {
+        title: "Day 30: Final Project",
+        content: `Use what you’ve learned to create a simple Python program/project.\n\nFeel free to write your own code in the editor and run it.`,
+        code: `# Write your Python code here\n`
+      }
+    ];
+
+    const dayListElem = document.getElementById("day-list");
+    const lessonTitle = document.getElementById("lesson-title");
+    const lessonText = document.getElementById("lesson-text");
+    const editorContainer = document.getElementById("editor-container");
+    const codeEditor = document.getElementById("code-editor");
+    const runBtn = document.getElementById("run-btn");
+    const outputContainer = document.getElementById("output-container");
+    const prevBtn = document.getElementById("prev-btn");
+    const nextBtn = document.getElementById("next-btn");
+
+    let currentDay = -1; // Welcome screen
+
+    function escapeHtml(text) {
+      return text.replace(/[&<>"']/g, function(m) {
+        return {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[m];
+      });
+    }
+
+    function setActiveDayButton(dayIndex) {
+      const buttons = dayListElem.querySelectorAll("button");
+      buttons.forEach((button, idx) => {
+        button.classList.toggle("active", idx === dayIndex);
+      });
+    }
+
+    function renderDayList() {
+      lessons.forEach((lesson, index) => {
+        const li = document.createElement("li");
+        const btn = document.createElement("button");
+        btn.textContent = `Day ${index + 1}`;
+        btn.setAttribute("aria-label", lesson.title);
+        btn.addEventListener("click", () => {
+          showLesson(index);
+        });
+        li.appendChild(btn);
+        dayListElem.appendChild(li);
+      });
+    }
+
+    function showLesson(dayIndex) {
+      currentDay = dayIndex;
+      setActiveDayButton(dayIndex);
+      const lesson = lessons[dayIndex];
+      lessonTitle.textContent = lesson.title;
+      lessonText.textContent = lesson.content;
+      if (lesson.code && lesson.code !== "# Conceptual lesson - no runnable code here" && lesson.code !== "# Conceptual lesson about pip") {
+        editorContainer.style.display = "flex";
+        codeEditor.value = lesson.code;
+        outputContainer.textContent = "";
+        runBtn.disabled = false;
+        loadStatus.textContent = "";
+      } else {
+        // Conceptual lesson with no runnable code
+        editorContainer.style.display = "none";
+        outputContainer.textContent = "";
+        runBtn.disabled = true;
+        loadStatus.textContent = "This is a conceptual lesson with no runnable code.";
+      }
+      updateNavigationButtons();
+    }
+
+    function updateNavigationButtons() {
+      prevBtn.disabled = currentDay <= 0;
+      nextBtn.disabled = currentDay === -1 || currentDay >= lessons.length - 1;
+    }
+
+    runBtn.addEventListener("click", async () => {
+      runBtn.disabled = true;
+      outputContainer.textContent = "";
+      loadStatus.textContent = "Running...";
+      try {
+        // Redirect stdout and stderr
+        let output = "";
+        const printFunc = (s) => { output += s + "\n"; };
+        pyodide.runPython(`
+import sys
+import io
+sys.stdout = io.StringIO()
+sys.stderr = sys.stdout
+`);
+        await pyodide.runPythonAsync(codeEditor.value);
+        output = pyodide.runPython("sys.stdout.getvalue()");
+        outputContainer.textContent = output;
+        loadStatus.textContent = "Execution finished.";
+      } catch (err) {
+        outputContainer.textContent = err;
+        loadStatus.textContent = "Error in execution.";
+      } finally {
+        runBtn.disabled = false;
+      }
+    });
+
+    prevBtn.addEventListener("click", () => {
+      if (currentDay > 0) {
+        showLesson(currentDay - 1);
+      }
+    });
+
+    nextBtn.addEventListener("click", () => {
+      if (currentDay < lessons.length - 1) {
+        showLesson(currentDay + 1);
+      }
+    });
+
+    // Render initial day list
+    renderDayList();
+
+    // Show welcome message
+    lessonTitle.textContent = "Welcome to 30 Days of Python";
+    lessonText.textContent = "Select a day from the left to start coding Python live in your browser.";
+    editorContainer.style.display = "none";
+    prevBtn.disabled = true;
+    nextBtn.disabled = false;
+  }
+  main();
+</script>
+</body>
+</html>
+
